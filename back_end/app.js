@@ -1,0 +1,57 @@
+var express = require('express')
+var app = express()
+var mongoose = require('mongoose');
+var bodyParser = require('body-parser')
+var databaseConfig = require('./config/database')
+var Attendance = require('./models/attendance')
+
+mongoose.connect(databaseConfig.address);
+
+/* app.use(express.json())
+ */
+app.use(bodyParser())
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({
+    extended: false
+}));
+
+
+
+const CronJob = require('cron').CronJob;
+console.log('Before job instantiation');
+const job = new CronJob('00 00 00 * * *', function () {
+    const d = new Date();
+    console.log('Cron :: onTick:', d);
+    Attendance.populateEmploys(function (err, doc) {
+        if (err) console.log(err)
+    })
+});
+console.log('After job instantiation');
+job.start();
+
+
+
+
+var aurdinoreport = require('./routes/aurdinoreport')
+var login = require('./routes/user/login')
+var register = require('./routes/user/register')
+var preference = require('./routes/api/preference')
+var history = require('./routes/api/history')
+var presentState = require('./routes/device/presentState')
+var userPresentState = require('./routes/api/presentState')
+var updatePreference = require('./routes/api/updatePreference')
+
+
+app.use('/user/login', login)
+app.use('/user/register', register)
+app.use('/user/api/preference', preference)
+app.use('/user/api/history', history)
+app.use('/user/api/presentstate', userPresentState)
+app.use('/user/api/updatePreference', updatePreference)
+
+app.use('/ard', aurdinoreport)
+app.use('/ard/presentstate', presentState)
+
+
+
+app.listen(1234)
