@@ -11,15 +11,15 @@ mongoose.connect(databaseConfig.address);
 
 /* app.use(express.json())
  */
-/* app.use(bodyParser())
+app.use(bodyParser())
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
-})); */
+}));
 
 
 
-/* const CronJob = require('cron').CronJob;
+const CronJob = require('cron').CronJob;
 console.log('Before job instantiation');
 const job = new CronJob('00 00 00 * * *', function () {
     const d = new Date();
@@ -29,7 +29,7 @@ const job = new CronJob('00 00 00 * * *', function () {
     })
 });
 console.log('After job instantiation');
-job.start(); */
+job.start();
 
 
 
