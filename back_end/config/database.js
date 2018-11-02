@@ -1,8 +1,6 @@
 module.exports.address = 'mongodb://localhost/securtity'
 module.exports.secret = 'rainthesecrets'
-var Admin = require('../models/admin')
-var Employ = require('../models/employ')
-var Attendance = require('../models/attendance')
+
 var moreThanOneDay = function (prev, curr) {
     if (curr - prev > 60 * 60 * 24 * 1000) {
         return true

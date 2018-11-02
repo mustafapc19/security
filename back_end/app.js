@@ -4,6 +4,8 @@ var mongoose = require('mongoose');
 var bodyParser = require('body-parser')
 var databaseConfig = require('./config/database')
 var Attendance = require('./models/attendance')
+var zmq = require('zeromq');
+var sock = zmq.socket('sub');
 
 mongoose.connect(databaseConfig.address);
 
@@ -31,15 +33,22 @@ job.start();
 
 
 
+// sock.connect('tcp://127.0.0.1:3000');
+sock.connect('tcp://localhost:3000')
+sock.subscribe('rfid');
+console.log('Subscriber connected to port 3000');
 
-var aurdinoreport = require('./routes/aurdinoreport')
-var login = require('./routes/user/login')
+sock.on('message', function (topic, message) {
+    console.log('received a message related to:', topic.toString(), 'containing message:', message.toString());
+});
+
+
+
+
+
+/* var login = require('./routes/user/login')
 var register = require('./routes/user/register')
 var preference = require('./routes/api/preference')
-var history = require('./routes/api/history')
-var presentState = require('./routes/device/presentState')
-var userPresentState = require('./routes/api/presentState')
-var updatePreference = require('./routes/api/updatePreference')
 
 
 app.use('/user/login', login)
@@ -50,7 +59,7 @@ app.use('/user/api/presentstate', userPresentState)
 app.use('/user/api/updatePreference', updatePreference)
 
 app.use('/ard', aurdinoreport)
-app.use('/ard/presentstate', presentState)
+app.use('/ard/presentstate', presentState) */
 
 
 
