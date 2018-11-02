@@ -39,7 +39,7 @@ sock.subscribe('rfid');
 console.log('Subscriber connected to port 3000');
 
 sock.on('message', function (topic, message) {
-    console.log('received a message related to:', topic.toString(), 'containing message:', message.toString());
+    console.log('received a message related to:', topic.toString('utf8'), 'containing message:', message.toString('utf8'));
 });
 
 
