@@ -6,6 +6,7 @@ var databaseConfig = require('./config/database')
 var Attendance = require('./models/attendance')
 var zmq = require('zeromq');
 var sock = zmq.socket('sub');
+var router = require('./routes/device/pushAttendance')
 
 mongoose.connect(databaseConfig.address);
 
@@ -38,29 +39,30 @@ sock.connect('tcp://localhost:3000')
 sock.subscribe('rfid');
 console.log('Subscriber connected to port 3000');
 
-sock.on('message', function (topic, message) {
-    console.log('message',topic.toString('utf8'))
+sock.on('message', function (topic) {
+    topic = topic.toString('utf8')
+    topic = topic.split(" ")
+
+    console.log('message',topic[0])
+
+    switch(topic[0]) {
+    case "rfid":
+        router(topic)
+        break;
+/*     case y:
+        code block
+        break; */
+    default:
+        console.log("Error 0mq default case");
+
+    }
+    // router(topic)
     /* console.log('received a message related to:', topic.toString('utf8'), 'containing message:', message.toString('utf8')); */
 });
 
 
 
 
-
-/* var login = require('./routes/user/login')
-var register = require('./routes/user/register')
-var preference = require('./routes/api/preference')
-
-
-app.use('/user/login', login)
-app.use('/user/register', register)
-app.use('/user/api/preference', preference)
-app.use('/user/api/history', history)
-app.use('/user/api/presentstate', userPresentState)
-app.use('/user/api/updatePreference', updatePreference)
-
-app.use('/ard', aurdinoreport)
-app.use('/ard/presentstate', presentState) */
 
 
 
