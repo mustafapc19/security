@@ -1,0 +1,1 @@
+python main.py --display sh1106 --interface spi
