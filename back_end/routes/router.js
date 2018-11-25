@@ -5,8 +5,7 @@ var Router = new EventEmitter();
 
 
 Router.route = function (topic) {
-    topic = topic.toString('utf8')
-    topic = topic.split(" ")
+
 
 
     if(topic=='rfid')

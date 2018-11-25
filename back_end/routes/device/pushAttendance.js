@@ -18,7 +18,7 @@ var Attendance = require('../../models/attendance')
 }) */
 
 var router = function(topic,callback){
-    // Attendance.recordAttendanceByEmployId(topic[1],callback)
+    Attendance.recordAttendanceByEmployId(topic[1],callback)
     console.log("Inside router",topic);
 
 }
