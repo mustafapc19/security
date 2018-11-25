@@ -1,7 +1,7 @@
 import os.path
 from demo_opts import get_device
 from PIL import Image
-
+#from read import rfid_detect
 
 def screensaver():
     img_path = os.path.abspath(os.path.join(os.path.dirname(__file__),'images', 'edhal.png'))
@@ -19,12 +19,15 @@ def screensaver():
 
 
 if __name__ == "__main__":
-    try:
-        device = get_device()
-        device = get_device()
-        screensaver()
-    except KeyboardInterrupt:
-        pass
+
+    device = get_device()
+    while(True):
+        try:
+            #if(rfid_detect()):
+             #   rfid_callback()
+            screensaver()
+        except KeyboardInterrupt:
+            pass
 
 
 
