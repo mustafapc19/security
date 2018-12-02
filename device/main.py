@@ -1,5 +1,5 @@
 import os.path
-# from lib/displ demo_opts import get_device
+from demo_opts import get_device
 from PIL import Image
 from events import keypress
 from display import screensaver
@@ -9,16 +9,16 @@ import hashlib
 from pyfingerprint.pyfingerprint import PyFingerprint
 
 
-# Search for a finger
+## Search for a finger
 ##
 
 if __name__ == "__main__":
-    # Tries to initialize the sensor
+## Tries to initialize the sensor
     try:
         f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
         print('hello')
 
-        if (f.verifyPassword() == False):
+        if ( f.verifyPassword() == False ):
             raise ValueError('The given fingerprint sensor password is wrong!')
 
     except Exception as e:
