@@ -1,6 +1,7 @@
 import os.path
 from PIL import Image
 from luma.core.virtual import terminal
+from events import keypress
 import time
 
 
@@ -22,6 +23,10 @@ def screensaver(device):
 
 def menu(device):
     t_end = time.time() + 10
+    selected_option = 0
     while(time.time() < t_end):
         term = terminal(device)
         term.println("Welcome")
+        key = keypress()
+        if(key):
+            continue
