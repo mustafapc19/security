@@ -25,7 +25,7 @@ var EmploySchema = mongoose.Schema({
         unique: true
     },
     access: [{
-        type: String
+        type: Number
     }],
     email: {
         type: String,
@@ -50,7 +50,7 @@ module.exports.createEmploy = function (newEmploy, callback) {
             })
             .limit(1)
             .then((doc) => {
-                if (doc.employid) {
+                if (doc.employid !== null) {
                     newEmploy.employid = doc.employid + 1
                     newEmploy.save(callback)
                 } else {
@@ -67,12 +67,32 @@ module.exports.createEmploy = function (newEmploy, callback) {
 };
 
 
-module.exports.getEmployByEmployname = function (username, callback) {
+module.exports.grantAccessById = function (employid, access, callback) {
     var query = {
-        username: username
+        employid: employid
     };
-    Employ.findOne(query, callback);
+    Employ.findOne(query, function (err, doc) {
+        if (err) {
+            console.log("Error")
+        } else {
+            doc.access.push(access)
+            doc.save(callback)
+        }
+    });
 };
+
+module.exports.accessByHash = function (hash, callback) {
+
+    Employ.findOne({
+        hash: hash
+    }, function (err, doc) {
+        if (err) {
+            console.log(err)
+        } else {
+            callback(doc.access)
+        }
+    })
+}
 
 module.exports.recordAttendanceByHash = function (hash, callback) {
     Attendance.find({
