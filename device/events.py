@@ -1,0 +1,2 @@
+def keypress():
+    return True
