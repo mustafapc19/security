@@ -46,4 +46,6 @@ def menu(device):
         if(key):
             if(key == 1):
                 selected_option = wrapAround(selected_option, length, 1)
-            continue
+            elif(key == 2):
+                selected_option = wrapAround(selected_option, length, 0)
+        continue
