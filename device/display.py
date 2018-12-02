@@ -21,12 +21,29 @@ def screensaver(device):
         device.display(background.convert(device.mode))
 
 
+def wrapAround(target, length, flag):
+    if(flag):
+        if(target == length):
+            target = 0
+        else:
+            target += 1
+    else:
+        if(target > 0):
+            target -= 1
+        else:
+            target = length
+    return target
+
+
 def menu(device):
     t_end = time.time() + 10
     selected_option = 0
+    length = 2
     while(time.time() < t_end):
         term = terminal(device)
         term.println("Welcome")
         key = keypress()
         if(key):
+            if(key == 1):
+                selected_option = wrapAround(selected_option, length, 1)
             continue
