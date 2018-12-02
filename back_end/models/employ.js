@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
 var Schema = mongoose.Schema;
-var Attendance = require('./attendance')
+var Attendance = require('./attendance');
 
 var EmploySchema = mongoose.Schema({
     /* _id: {
@@ -49,18 +49,18 @@ module.exports.createEmploy = function (newEmploy, callback) {
                 employid: -1
             })
             .limit(1)
-            .then((doc) => {
+            .then(function (doc) {
                 if (doc.employid !== null) {
-                    newEmploy.employid = doc.employid + 1
-                    newEmploy.save(callback)
+                    newEmploy.employid = doc.employid + 1;
+                    newEmploy.save(callback);
                 } else {
-                    newEmploy.save(callback)
+                    newEmploy.save(callback);
                 }
             })
-            .catch((err) => {
-                console.log(err)
-                callback(err)
-            })
+            .catch(function (err) {
+                console.log(err);
+                callback(err);
+            });
     } else {
         console.log("else");
     }
@@ -73,10 +73,10 @@ module.exports.grantAccessById = function (employid, access, callback) {
     };
     Employ.findOne(query, function (err, doc) {
         if (err) {
-            console.log("Error")
+            console.log("Error");
         } else {
-            doc.access.push(access)
-            doc.save(callback)
+            doc.access.push(access);
+            doc.save(callback);
         }
     });
 };
@@ -87,12 +87,12 @@ module.exports.accessByHash = function (hash, callback) {
         hash: hash
     }, function (err, doc) {
         if (err) {
-            console.log(err)
+            console.log(err);
         } else {
-            callback(doc.access)
+            callback(doc.access);
         }
-    })
-}
+    });
+};
 
 module.exports.recordAttendanceByHash = function (hash, callback) {
     Attendance.find({
@@ -102,12 +102,12 @@ module.exports.recordAttendanceByHash = function (hash, callback) {
             date: -1
         })
         .limit(1)
-        .then((doc) => {
-            doc.attendance = true
-            doc.save(callback)
+        .then(function (doc) {
+            doc.attendance = true;
+            doc.save(callback);
         })
-        .catch((err) => {
-            console.log(err)
-            callback(err)
-        })
-}
+        .catch(function (err) {
+            console.log(err);
+            callback(err);
+        });
+};

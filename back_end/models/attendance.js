@@ -27,14 +27,14 @@ var Attendance = (module.exports = mongoose.model(
 ));
 
 module.exports.recordAttendanceByEmployId = function (employid, callback) {
-  Employ.recordAttendanceByEmployId(employid, callback)
-}
+  Employ.recordAttendanceByEmployId(employid, callback);
+};
 
 module.exports.populateEmploys = function (callback) {
-  var employs = Employ.find()
+  var employs = Employ.find();
   for (var i = 0, len = employs.length; i < len; i++) {
-    attendance = new Attendance()
-    attendance.employ = employs[i]._id
-    attendance.save(callback)
+    attendance = new Attendance();
+    attendance.employ = employs[i]._id;
+    attendance.save(callback);
   }
-}
+};
