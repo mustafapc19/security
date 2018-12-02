@@ -25,7 +25,7 @@ var EmploySchema = mongoose.Schema({
         unique: true
     },
     access: [{
-        type: Number
+        type: String
     }],
     email: {
         type: String,
@@ -43,14 +43,14 @@ var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
 module.exports.createEmploy = function (newEmploy, callback) {
     console.log("create user entered");
     // console.log("newEmploy :", newEmploy)
-    if (newEmploy.username && newEmploy.password && newEmploy.hash) {
+    if (newEmploy.username && newEmploy.hash) {
         Employ.find({})
             .sort({
                 employid: -1
             })
             .limit(1)
             .then(function (doc) {
-                if (doc.employid !== null) {
+                if (doc !== null) {
                     newEmploy.employid = doc.employid + 1;
                     newEmploy.save(callback);
                 } else {
@@ -89,7 +89,7 @@ module.exports.accessByHash = function (hash, callback) {
         if (err) {
             console.log(err);
         } else {
-            callback(doc.access);
+            callback(doc);
         }
     });
 };

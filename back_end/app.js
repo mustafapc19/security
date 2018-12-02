@@ -6,6 +6,7 @@ var databaseConfig = require('./config/database');
 var Attendance = require('./models/attendance');
 
 var pushAttendance = require('./routes/device/pushAttendance');
+var getAccessByHash = require('./routes/device/getAccessByHash')
 
 mongoose.connect(databaseConfig.address);
 
@@ -33,7 +34,7 @@ job.start();
 
 
 app.use('/device/pushAttendance', pushAttendance);
-
+app.use('/device/getAccessByHash', getAccessByHash);
 
 
 
