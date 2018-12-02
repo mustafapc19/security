@@ -1,5 +1,4 @@
 var mongoose = require("mongoose");
-var bcrypt = require("bcryptjs");
 var uniqueValidator = require("mongoose-unique-validator");
 var Schema = mongoose.Schema;
 var Attendance = require('./attendance')
@@ -9,23 +8,32 @@ var EmploySchema = mongoose.Schema({
             type: mongoose.Schema.Types.ObjectId
         }, */
     employid: {
-        type: String
+        type: Number,
+        required: true,
+        default: 0,
+        index: true,
+        unique: true
     },
     username: {
+        type: String,
+        required: true,
+    },
+    hash: {
         type: String,
         index: true,
         required: true,
         unique: true
     },
+    access: [{
+        type: String
+    }],
     email: {
         type: String,
-        required: true,
         unique: true
         // index: true
     },
     password: {
         type: String,
-        required: true
     }
 });
 
@@ -35,27 +43,29 @@ var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
 module.exports.createEmploy = function (newEmploy, callback) {
     console.log("create user entered");
     // console.log("newEmploy :", newEmploy)
-    if (newEmploy.username && newEmploy.password) {
-        bcrypt.genSalt(10, function (err, salt) {
-            bcrypt.hash(newEmploy.password, salt, function (err, hash) {
-                newEmploy.password = hash;
-
-                newEmploy.save(callback);
-            });
-        });
+    if (newEmploy.username && newEmploy.password && newEmploy.hash) {
+        Employ.find({})
+            .sort({
+                employid: -1
+            })
+            .limit(1)
+            .then((doc) => {
+                if (doc.employid) {
+                    newEmploy.employid = doc.employid + 1
+                    newEmploy.save(callback)
+                } else {
+                    newEmploy.save(callback)
+                }
+            })
+            .catch((err) => {
+                console.log(err)
+                callback(err)
+            })
     } else {
         console.log("else");
     }
 };
 
-module.exports.getEmployByEmail = function (email, callback) {
-    console.log("Get user by email id enterd");
-
-    var query = {
-        email: email
-    };
-    Employ.findOne(query, callback);
-};
 
 module.exports.getEmployByEmployname = function (username, callback) {
     var query = {
@@ -64,9 +74,9 @@ module.exports.getEmployByEmployname = function (username, callback) {
     Employ.findOne(query, callback);
 };
 
-module.exports.recordAttendanceByEmployId = function (employid, callback) {
+module.exports.recordAttendanceByHash = function (hash, callback) {
     Attendance.find({
-            employid: employid
+            hash: hash
         })
         .sort({
             date: -1
