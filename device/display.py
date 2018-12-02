@@ -1,6 +1,7 @@
 import os.path
 from PIL import Image
 from luma.core.virtual import terminal
+import time
 
 
 def screensaver(device):
@@ -20,6 +21,7 @@ def screensaver(device):
 
 
 def menu(device):
-    while(True):
+    t_end = time.time() + 10
+    while(time.time() < t_end):
         term = terminal(device)
         term.println("Welcome")
