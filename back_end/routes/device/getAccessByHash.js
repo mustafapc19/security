@@ -12,7 +12,7 @@ router.post('/', function (req, res) {
                 };
                 res.status(200).send(json);
             } else {
-                res.status(500).send("NoInfoFound")
+                res.status(500).send("NoInfoFound");
             }
 
         });

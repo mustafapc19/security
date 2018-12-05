@@ -53,7 +53,7 @@ module.exports.recordAttendanceByHash = function (hash, callback) {
           callback(err);
         });
     }
-  })
+  });
 
 };
 

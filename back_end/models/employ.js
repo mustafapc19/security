@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
 var Schema = mongoose.Schema;
-Attendance = require('./attendance')
+Attendance = require('./attendance');
 
 var EmploySchema = mongoose.Schema({
     /* _id: {
@@ -91,7 +91,7 @@ module.exports.grantAccessById = function (employid, access, callback) {
             console.log("Error");
         } else {
             if (flag) {
-                callback('error-grantAccess , not unique')
+                callback('error-grantAccess , not unique');
             } else {
                 doc.access.push(access);
                 doc.save(callback);
