@@ -3,7 +3,7 @@ var router = express.Router();
 var Employ = require('../../models/employ');
 
 
-router.get('/', function (req, res) {
+router.post('/', function (req, res) {
 
     if (req.body.username && req.body.hash) {
         newEmploy = {
