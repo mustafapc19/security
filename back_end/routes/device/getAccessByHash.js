@@ -5,12 +5,14 @@ var Employ = require('../../models/employ');
 router.post('/', function (req, res) {
     if (req.body.hash) {
         Employ.accessByHash(req.body.hash, function (doc) {
-            if (doc !== null) {
+            if (doc) {
                 json = {
                     username: doc.username,
                     access: doc.access
                 };
                 res.status(200).send(json);
+            } else {
+                res.status(500).send("NoInfoFound")
             }
 
         });
