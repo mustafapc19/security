@@ -28,8 +28,8 @@ var EmploySchema = mongoose.Schema({
         type: String
     }],
     email: {
-        type: String,
-        unique: true
+        type: String
+        // unique: true
         // index: true
     },
     password: {
@@ -42,24 +42,31 @@ EmploySchema.plugin(uniqueValidator);
 
 
 var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
-module.exports.createEmploy = function (newEmploy, callback) {
-    if (newEmploy.username && newEmploy.hash) {
+module.exports.createEmploy = function (employ, callback) {
+    if (employ.username && employ.hash) {
         Employ.find({})
             .sort({
                 employid: -1
             })
             .limit(1)
             .then(function (doc) {
-                if (doc !== null) {
-                    newEmploy.employid = doc.employid + 1;
+                if (typeof (doc) == 'object' && doc.length > 0) {
+                    newEmploy = new Employ();
+                    newEmploy.username = employ.username;
+                    newEmploy.hash = employ.hash;
+                    newEmploy.employid = doc[0].employid + 1;
                     newEmploy.save(callback);
                 } else {
+                    newEmploy = new Employ();
+                    newEmploy.username = employ.username;
+                    newEmploy.hash = employ.hash;
+                    newEmploy.employid = 0;
                     newEmploy.save(callback);
                 }
             })
             .catch(function (err) {
                 console.log(err);
-                callback(err);
+                callback('createemploy::catch', err);
             });
     } else {
         console.log("else --  create employ");
@@ -75,11 +82,20 @@ module.exports.grantAccessById = function (employid, access, callback) {
         employid: employid
     };
     Employ.findOne(query, function (err, doc) {
+        flag = false;
+        for (var i = 0; i < doc.access.length; i++) {
+            if (access == doc.access[i])
+                flag = true;
+        }
         if (err) {
             console.log("Error");
         } else {
-            doc.access.push(access);
-            doc.save(callback);
+            if (flag) {
+                callback('error-grantAccess , not unique')
+            } else {
+                doc.access.push(access);
+                doc.save(callback);
+            }
         }
     });
 };

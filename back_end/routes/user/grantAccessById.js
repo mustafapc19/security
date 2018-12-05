@@ -9,7 +9,7 @@ router.post('/', function (req, res) {
                 console.log("accessById", err);
                 res.status(500).send("Error");
             } else {
-                res.statusCode(200).send('ok');
+                res.status(200).send('ok');
             }
 
         });

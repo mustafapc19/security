@@ -4,6 +4,8 @@ var Employ = require('../../models/employ');
 
 
 router.post('/', function (req, res) {
+    console.log('employadd route : ', req.body);
+
 
     if (req.body.username && req.body.hash) {
         newEmploy = {
@@ -15,7 +17,7 @@ router.post('/', function (req, res) {
                 console.log("employAdd :", err);
                 res.status(500).send("Error");
             } else {
-                res.statusCode(200).send("Done");
+                res.status(200).send("Done");
             }
 
         });
