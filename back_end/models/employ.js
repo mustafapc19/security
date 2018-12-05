@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
 var Schema = mongoose.Schema;
-var Attendance = require('./attendance');
+Attendance = require('./attendance')
 
 var EmploySchema = mongoose.Schema({
     /* _id: {
@@ -114,6 +114,8 @@ module.exports.accessByHash = function (hash, callback) {
 };
 
 module.exports.recordAttendanceByHash = function (hash, callback) {
+    console.log("recordHash-------------", typeof (Attendance));
+
     Attendance.find({
             hash: hash
         })
@@ -123,7 +125,7 @@ module.exports.recordAttendanceByHash = function (hash, callback) {
         .limit(1)
         .then(function (doc) {
             doc.attendance = true;
-            doc.save(callback);
+            doc.save();
         })
         .catch(function (err) {
             console.log(err);

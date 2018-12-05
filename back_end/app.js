@@ -9,6 +9,7 @@ var pushAttendance = require('./routes/device/pushAttendance');
 var getAccessByHash = require('./routes/device/getAccessByHash');
 var employAdd = require('./routes/user/employAdd');
 var grantAccessById = require('./routes/user/grantAccessById');
+var populateEmploy = require('./routes/api/populateEmploys');
 
 mongoose.connect(databaseConfig.address);
 
@@ -39,6 +40,7 @@ app.use('/device/pushAttendance', pushAttendance);
 app.use('/device/getAccessByHash', getAccessByHash);
 app.use('/user/employAdd', employAdd);
 app.use('/user/grantAccessById', grantAccessById);
+app.use('/api/populateEmploys', populateEmploy);
 
 
 
