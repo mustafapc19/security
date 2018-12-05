@@ -39,10 +39,10 @@ var EmploySchema = mongoose.Schema({
 
 EmploySchema.plugin(uniqueValidator);
 
+
+
 var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
 module.exports.createEmploy = function (newEmploy, callback) {
-    console.log("create user entered");
-    // console.log("newEmploy :", newEmploy)
     if (newEmploy.username && newEmploy.hash) {
         Employ.find({})
             .sort({
@@ -62,9 +62,12 @@ module.exports.createEmploy = function (newEmploy, callback) {
                 callback(err);
             });
     } else {
-        console.log("else");
+        console.log("else --  create employ");
     }
 };
+
+
+
 
 
 module.exports.grantAccessById = function (employid, access, callback) {
