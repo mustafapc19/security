@@ -1,36 +1,50 @@
-import os.path
-from demo_opts import get_device
-from PIL import Image
-from events import keypress
-from display import screensaver
-from display import menu
-#from read import rfid_detect
-import hashlib
-from pyfingerprint.pyfingerprint import PyFingerprint
+from display import screensaver,welcome,menu
+from rfid import read_rfid
+import finger
+import time
+import RPi.GPIO as GPIO
 
+clk = 11
+dt = 12
+sw = 13
 
-## Search for a finger
-##
+GPIO.setmode(GPIO.BOARD)
+GPIO.setup(clk, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(dt, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(sw, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+clkLastState = GPIO.input(clk)
+global counter
+counter = 0
+global clickToggle 
+clickToggle = False
 
-if __name__ == "__main__":
-## Tries to initialize the sensor
-    try:
-        f = PyFingerprint('/dev/ttyUSB0', 57600, 0xFFFFFFFF, 0x00000000)
-        print('hello')
+def sw_callback(channel):
+    global clickToggle
+    global counter
+    if(counter%4 == 0):
+        clickToggle = True
 
-        if ( f.verifyPassword() == False ):
-            raise ValueError('The given fingerprint sensor password is wrong!')
+GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
 
-    except Exception as e:
-        print('The fingerprint sensor could not be initialized!')
-        print('Exception message: ' + str(e))
-        exit(1)
-
-    device = get_device()
-    while(True):
-        # if(rfid_detect()):
-            #   rfid_callback()
-
-        if(f.readImage()):
-            menu(device)
-        screensaver(device)
+try:
+    while True:
+        ret,hashval = finger.search()
+        if ret:
+            welcome("welcome akhil")
+            menu(0)
+            while True:
+                if(clickToggle):
+                    clickToggle = False
+                    break
+                else:
+                    clkState = GPIO.input(clk)
+                    dtState = GPIO.input(dt)
+                    if clkState != clkLastState:
+                        counter += 1
+                        menu(counter%5)
+                    clkLastState = clkState
+                    time.sleep(0.1)
+        else:
+            welcome("Acess Denied")
+finally:
+    GPIO.cleanup()

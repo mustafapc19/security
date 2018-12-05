@@ -1,51 +1,132 @@
 import os.path
-from PIL import Image
+import logging
+from PIL import Image,ImageFont, ImageDraw
 from luma.core.virtual import terminal
-from events import keypress
-import time
+from luma.oled.device import ssd1306, ssd1325, ssd1331, sh1106
+from luma.core.interface.serial import i2c
+from luma.core.render import canvas
+from luma.core import cmdline, error
+import RPi.GPIO as GPIO
+
+serial = i2c(port=1, address=0x3C)
+device = ssd1306(serial, rotate=0)
 
 
-def screensaver(device):
+global menuindex
+menuindex=0
+
+def invert(draw,x,y,text):
+    font = ImageFont.load_default()
+    draw.rectangle((x, y, x+120, y+10), outline=255, fill=255)
+    draw.text((x, y), text, font=font, outline=0,fill="black")
+
+def menu(index):
+    menustr=['option1','option2','option3','option4','back']        
+    global menuindex
+    font = ImageFont.load_default()
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white", fill="black")
+        for i in range(len(menustr)):
+            if( i == index):
+                menuindex = i
+                invert(draw, 2, i*10, menustr[i])
+            else:
+                draw.text((2, i*10), menustr[i], font=font, fill=255)
+                
+def menu_operation(strval):
+        if ( strval == "option1"):
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                draw.text((10, 20), "Thank you", fill="white")
+                draw.text((10, 30), "Keep following", fill="white")
+        if ( strval == "option2"):
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                draw.text((10, 20), "Thank you", fill="white")
+                draw.text((10, 30), "Keep following", fill="white")
+        if ( strval == "option3"):
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                draw.text((10, 20), "Thank you", fill="white")
+                draw.text((10, 30), "Keep following", fill="white")
+        if ( strval == "option4"):
+            with canvas(device) as draw:
+                draw.rectangle(device.bounding_box, outline="white", fill="black")
+                draw.text((10, 20), "Thank you", fill="white")
+                draw.text((10, 30), "Keep following", fill="white")
+        
+def screensaver():
     img_path = os.path.abspath(os.path.join(
         os.path.dirname(__file__), 'images', 'edhal.png'))
     logo = Image.open(img_path).convert("RGBA")
     fff = Image.new(logo.mode, logo.size, (0,) * 4)
-
     background = Image.new("RGBA", device.size, "black")
     posn = ((device.width - logo.width) // 2, 0)
-
-
     rot = logo.rotate(0, resample=Image.BILINEAR)
     img = Image.composite(rot, fff, rot)
     background.paste(img, posn)
     device.display(background.convert(device.mode))
 
 
-def wrapAround(target, length, flag):
-    if(flag):
-        if(target == length):
-            target = 0
-        else:
-            target += 1
-    else:
-        if(target > 0):
-            target -= 1
-        else:
-            target = length
-    return target
-
-
-def menu(device):
-    t_end = time.time() + 10
-    selected_option = 0
-    length = 2
+def welcome(message):
     term = terminal(device)
-    term.println("Welcome")
-    while(time.time() < t_end):
-        key = keypress()
-        if(key):
-            if(key == 1):
-                selected_option = wrapAround(selected_option, length, 1)
-            elif(key == 2):
-                selected_option = wrapAround(selected_option, length, 0)
-        continue
+    term.println(message)
+   
+# logging
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)-15s - %(message)s'
+)
+# ignore PIL debug messages
+logging.getLogger('PIL').setLevel(logging.ERROR)
+
+
+def display_settings(args):
+    """
+    Display a short summary of the settings.
+
+    :rtype: str
+    """
+    iface = ''
+    display_types = cmdline.get_display_types()
+    if args.display not in display_types['emulator']:
+        iface = 'Interface: {}\n'.format(args.interface)
+
+    lib_name = cmdline.get_library_for_display_type(args.display)
+    if lib_name is not None:
+        lib_version = cmdline.get_library_version(lib_name)
+    else:
+        lib_name = lib_version = 'unknown'
+
+    import luma.core
+    version = 'luma.{} {} (luma.core {})'.format(
+        lib_name, lib_version, luma.core.__version__)
+
+    return 'Version: {}\nDisplay: {}\n{}Dimensions: {} x {}\n{}'.format(
+        version, args.display, iface, args.width, args.height, '-' * 60)
+
+
+def get_device(actual_args=None):
+    """
+    Create device from command-line arguments and return it.
+    """
+    if actual_args is None:
+        actual_args = sys.argv[1:]
+    parser = cmdline.create_parser(description='luma.examples arguments')
+    args = parser.parse_args(actual_args)
+
+    if args.config:
+        # load config from file
+        config = cmdline.load_config(args.config)
+        args = parser.parse_args(config + actual_args)
+
+    print(display_settings(args))
+
+    # create device
+    try:
+        device = cmdline.create_device(args)
+    except error.Error as e:
+        parser.error(e)
+
+    return device
+

@@ -27,8 +27,7 @@ import signal
 import time
   
 class MFRC522:
-  #NRSTPD = 22
-  NRSTPD = 32
+  NRSTPD = 22
   
   MAX_LEN = 16
   
@@ -128,9 +127,8 @@ class MFRC522:
     
   serNum = []
   
-  def __init__(self, dev='/dev/spidev1.0', spd=1000000):
+  def __init__(self, dev='/dev/spidev0.0', spd=1000000):
     spi.openSPI(device=dev,speed=spd)
-    #GPIO.cleanup()
     GPIO.setmode(GPIO.BOARD)
     GPIO.setup(self.NRSTPD, GPIO.OUT)
     GPIO.output(self.NRSTPD, 1)
@@ -309,7 +307,7 @@ class MFRC522:
     (status, backData, backLen) = self.MFRC522_ToCard(self.PCD_TRANSCEIVE, buf)
     
     if (status == self.MI_OK) and (backLen == 0x18):
-      print "Size: " + str(backData[0])
+      #print "Size: " + str(backData[0])
       return    backData[0]
     else:
       return 0
@@ -361,8 +359,6 @@ class MFRC522:
     if not(status == self.MI_OK):
       print "Error while reading!"
     i = 0
-    if len(backData) == 16:
-      print "Sector "+str(blockAddr)+" "+str(backData)
   
   def MFRC522_Write(self, blockAddr, writeData):
     buff = []
@@ -416,3 +412,46 @@ class MFRC522:
     self.Write_MFRC522(self.TxAutoReg, 0x40)
     self.Write_MFRC522(self.ModeReg, 0x3D)
     self.AntennaOn()
+
+MIFAREReader = MFRC522()
+
+def read_rfid():
+    
+    # Scan for cards    
+    (status,TagType) = MIFAREReader.MFRC522_Request(MIFAREReader.PICC_REQIDL)
+    retvl=False
+    # If a card is found
+    if status == MIFAREReader.MI_OK:
+        retvl=True
+        #print "Card detected"
+    else:
+      return retvl,retvl
+    
+    # Get the UID of the card
+    (status,uid) = MIFAREReader.MFRC522_Anticoll()
+
+    # If we have the UID, continue
+    if status == MIFAREReader.MI_OK:
+
+        # Print UID
+        #print "Card read UID: %s,%s,%s,%s" % (uid[0], uid[1], uid[2], uid[3])
+    
+        # This is the default key for authentication
+        key = [0xFF,0xFF,0xFF,0xFF,0xFF,0xFF]
+        
+        # Select the scanned tag
+        MIFAREReader.MFRC522_SelectTag(uid)
+
+        # Authenticate
+        status = MIFAREReader.MFRC522_Auth(MIFAREReader.PICC_AUTHENT1A, 8, key, uid)
+
+        # Check if authenticated
+        if status == MIFAREReader.MI_OK:
+            MIFAREReader.MFRC522_Read(8)
+            MIFAREReader.MFRC522_StopCrypto1()
+        else:
+            print "Authentication error"
+        return retvl,uid
+
+
+
