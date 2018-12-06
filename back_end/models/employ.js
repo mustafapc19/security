@@ -1,12 +1,14 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
-var Schema = mongoose.Schema;
-var Attendance = require('./attendance')
+Attendance = require('./attendance');
 
+/**
+ * EmploySchema =
+ *          'empoyid' -> Its a self incrementing feild starting from 0
+ *          'access' -> Right now its just an array of strings, will be changed later
+ *
+ */
 var EmploySchema = mongoose.Schema({
-    /* _id: {
-            type: mongoose.Schema.Types.ObjectId
-        }, */
     employid: {
         type: Number,
         required: true,
@@ -28,8 +30,8 @@ var EmploySchema = mongoose.Schema({
         type: String
     }],
     email: {
-        type: String,
-        unique: true
+        type: String
+        // unique: true
         // index: true
     },
     password: {
@@ -39,42 +41,92 @@ var EmploySchema = mongoose.Schema({
 
 EmploySchema.plugin(uniqueValidator);
 
+
+
 var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
-module.exports.createEmploy = function (newEmploy, callback) {
-    console.log("create user entered");
-    // console.log("newEmploy :", newEmploy)
-    if (newEmploy.username && newEmploy.password && newEmploy.hash) {
+
+/**
+ * createEmploy = It creates an Employ record with a self incrementing 'employid' field.
+ */
+
+
+module.exports.createEmploy = function (employ, callback) {
+    if (employ.username && employ.hash) {
         Employ.find({})
             .sort({
                 employid: -1
             })
             .limit(1)
-            .then((doc) => {
-                if (doc.employid) {
-                    newEmploy.employid = doc.employid + 1
-                    newEmploy.save(callback)
+            .then(function (doc) {
+                if (doc.length > 0) {
+                    // console.log('if')
+                    newEmploy = new Employ();
+                    newEmploy.username = employ.username;
+                    newEmploy.hash = employ.hash;
+                    newEmploy.employid = doc[0].employid + 1;
+                    newEmploy.save(callback);
                 } else {
-                    newEmploy.save(callback)
+                    // console.log('not')
+                    newEmploy = new Employ();
+                    newEmploy.username = employ.username;
+                    newEmploy.hash = employ.hash;
+                    newEmploy.employid = 0;
+                    newEmploy.save(callback);
                 }
             })
-            .catch((err) => {
-                console.log(err)
-                callback(err)
-            })
+            .catch(function (err) {
+                console.log(err);
+                // callback('createemploy::catch', err);
+            });
     } else {
-        console.log("else");
+        // console.log("else --  create employ");
     }
 };
 
 
-module.exports.getEmployByEmployname = function (username, callback) {
+
+
+
+module.exports.grantAccessById = function (employid, access, callback) {
     var query = {
-        username: username
+        employid: employid
     };
-    Employ.findOne(query, callback);
+    Employ.findOne(query, function (err, doc) {
+        flag = false;
+        for (var i = 0; i < doc.access.length; i++) {
+            if (access == doc.access[i])
+                flag = true;
+        }
+        if (err) {
+            // console.log("Error");
+        } else {
+            if (flag) {
+                // callback('error-grantAccess , not unique');
+            } else {
+                doc.access.push(access);
+                doc.save(callback);
+            }
+        }
+    });
+};
+
+/* returns array of 'access' according hash */
+module.exports.accessByHash = function (hash, callback) {
+
+    Employ.findOne({
+        hash: hash
+    }, function (err, doc) {
+        if (err) {
+            console.log(err);
+        } else {
+            callback(doc);
+        }
+    });
 };
 
 module.exports.recordAttendanceByHash = function (hash, callback) {
+    // console.log("recordHash-------------", typeof (Attendance));
+
     Attendance.find({
             hash: hash
         })
@@ -82,12 +134,12 @@ module.exports.recordAttendanceByHash = function (hash, callback) {
             date: -1
         })
         .limit(1)
-        .then((doc) => {
-            doc.attendance = true
-            doc.save(callback)
+        .then(function (doc) {
+            doc.attendance = true;
+            doc.save();
         })
-        .catch((err) => {
-            console.log(err)
-            callback(err)
-        })
-}
+        .catch(function (err) {
+            console.log(err);
+            callback(err);
+        });
+};

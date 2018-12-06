@@ -1,18 +1,18 @@
-module.exports.address = 'mongodb://localhost/securtity'
-module.exports.secret = 'rainthesecrets'
+module.exports.address = 'mongodb://localhost/securtity';
+module.exports.secret = 'rainthesecrets';
 
 var moreThanOneDay = function (prev, curr) {
     if (curr - prev > 60 * 60 * 24 * 1000) {
-        return true
+        return true;
     } else {
-        return false
+        return false;
     }
 }
 module.exports.pluginUpdate = function timestamp(schema) {
 
     schema.pre('save', function (next) {
-        let now = Date.now()
-        this.date = now
+        let now = Date.now();
+        this.date = now;
         /* this.attendance = true
         let previousDay;
         if (previousDay === undefined) {
@@ -21,11 +21,8 @@ module.exports.pluginUpdate = function timestamp(schema) {
             prevthis.date
             Employ.find({}, function (err, arr) {
                 if (err) console.log(err)
-
-
             })
         } */
-
-        next()
-    })
-}
+        next();
+    });
+};

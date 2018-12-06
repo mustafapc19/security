@@ -1,17 +1,21 @@
-var express = require('express')
-var app = express()
+var express = require('express');
+var app = express();
 var mongoose = require('mongoose');
-var bodyParser = require('body-parser')
-var databaseConfig = require('./config/database')
-var Attendance = require('./models/attendance')
+var bodyParser = require('body-parser');
+var databaseConfig = require('./config/database');
+var Attendance = require('./models/attendance');
 
-var pushAttendance = require('./routes/device/pushAttendance')
+var pushAttendance = require('./routes/device/pushAttendance');
+var getAccessByHash = require('./routes/device/getAccessByHash');
+var employAdd = require('./routes/user/employAdd');
+var grantAccessById = require('./routes/user/grantAccessById');
+var populateEmploy = require('./routes/api/populateEmploys');
 
 mongoose.connect(databaseConfig.address);
 
 /* app.use(express.json())
  */
-app.use(bodyParser())
+app.use(bodyParser());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
     extended: false
@@ -19,23 +23,25 @@ app.use(bodyParser.urlencoded({
 
 
 
-const CronJob = require('cron').CronJob;
+CronJob = require('cron').CronJob;
 console.log('Before job instantiation');
-const job = new CronJob('00 00 00 * * *', function () {
-    const d = new Date();
+job = new CronJob('00 00 00 * * *', function () {
+    d = new Date();
     console.log('Cron :: onTick:', d);
-    Attendance.populateEmploys(function (err, doc) {
-        if (err) console.log(err)
-    })
+    Attendance.populateEmploys(function (err) {
+        if (err) console.log(err);
+    });
 });
 console.log('After job instantiation');
 job.start();
 
 
-app.use('/device/pushAttendance', pushAttendance)
+app.use('/device/pushAttendance', pushAttendance);
+app.use('/device/getAccessByHash', getAccessByHash);
+app.use('/user/employAdd', employAdd);
+app.use('/user/grantAccessById', grantAccessById);
+app.use('/api/populateEmploys', populateEmploy);
 
 
 
-
-
-app.listen(1234)
+app.listen(1234);
