@@ -1,12 +1,12 @@
-var express = require('express');
-var router = express.Router();
-var User = require('../../models/user');
-var jwt = require('jsonwebtoken');
-var config = require('../../config/database');
+var express = require('express')
+var router = express.Router()
+var User = require('../../models/user')
+var jwt = require('jsonwebtoken')
+var config = require('../../config/database')
 
-router.get('/', function (req, res) {
+router.post('/', function (req, res) {
 
-});
+})
 
 
-module.exports = router;
+module.exports = router

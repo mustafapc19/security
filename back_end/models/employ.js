@@ -1,7 +1,7 @@
 var mongoose = require("mongoose");
 var uniqueValidator = require("mongoose-unique-validator");
 var Schema = mongoose.Schema;
-Attendance = require('./attendance');
+var Attendance = require('./attendance')
 
 var EmploySchema = mongoose.Schema({
     /* _id: {
@@ -28,8 +28,8 @@ var EmploySchema = mongoose.Schema({
         type: String
     }],
     email: {
-        type: String
-        // unique: true
+        type: String,
+        unique: true
         // index: true
     },
     password: {
@@ -39,83 +39,42 @@ var EmploySchema = mongoose.Schema({
 
 EmploySchema.plugin(uniqueValidator);
 
-
-
 var Employ = (module.exports = mongoose.model("Employ", EmploySchema));
-module.exports.createEmploy = function (employ, callback) {
-    if (employ.username && employ.hash) {
+module.exports.createEmploy = function (newEmploy, callback) {
+    console.log("create user entered");
+    // console.log("newEmploy :", newEmploy)
+    if (newEmploy.username && newEmploy.password && newEmploy.hash) {
         Employ.find({})
             .sort({
                 employid: -1
             })
             .limit(1)
-            .then(function (doc) {
-                if (typeof (doc) == 'object' && doc.length > 0) {
-                    newEmploy = new Employ();
-                    newEmploy.username = employ.username;
-                    newEmploy.hash = employ.hash;
-                    newEmploy.employid = doc[0].employid + 1;
-                    newEmploy.save(callback);
+            .then((doc) => {
+                if (doc.employid) {
+                    newEmploy.employid = doc.employid + 1
+                    newEmploy.save(callback)
                 } else {
-                    newEmploy = new Employ();
-                    newEmploy.username = employ.username;
-                    newEmploy.hash = employ.hash;
-                    newEmploy.employid = 0;
-                    newEmploy.save(callback);
+                    newEmploy.save(callback)
                 }
             })
-            .catch(function (err) {
-                console.log(err);
-                callback('createemploy::catch', err);
-            });
+            .catch((err) => {
+                console.log(err)
+                callback(err)
+            })
     } else {
-        console.log("else --  create employ");
+        console.log("else");
     }
 };
 
 
-
-
-
-module.exports.grantAccessById = function (employid, access, callback) {
+module.exports.getEmployByEmployname = function (username, callback) {
     var query = {
-        employid: employid
+        username: username
     };
-    Employ.findOne(query, function (err, doc) {
-        flag = false;
-        for (var i = 0; i < doc.access.length; i++) {
-            if (access == doc.access[i])
-                flag = true;
-        }
-        if (err) {
-            console.log("Error");
-        } else {
-            if (flag) {
-                callback('error-grantAccess , not unique');
-            } else {
-                doc.access.push(access);
-                doc.save(callback);
-            }
-        }
-    });
-};
-
-module.exports.accessByHash = function (hash, callback) {
-
-    Employ.findOne({
-        hash: hash
-    }, function (err, doc) {
-        if (err) {
-            console.log(err);
-        } else {
-            callback(doc);
-        }
-    });
+    Employ.findOne(query, callback);
 };
 
 module.exports.recordAttendanceByHash = function (hash, callback) {
-    console.log("recordHash-------------", typeof (Attendance));
-
     Attendance.find({
             hash: hash
         })
@@ -123,12 +82,12 @@ module.exports.recordAttendanceByHash = function (hash, callback) {
             date: -1
         })
         .limit(1)
-        .then(function (doc) {
-            doc.attendance = true;
-            doc.save();
+        .then((doc) => {
+            doc.attendance = true
+            doc.save(callback)
         })
-        .catch(function (err) {
-            console.log(err);
-            callback(err);
-        });
-};
+        .catch((err) => {
+            console.log(err)
+            callback(err)
+        })
+}
