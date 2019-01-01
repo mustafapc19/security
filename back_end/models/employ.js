@@ -92,20 +92,25 @@ module.exports.grantAccessById = function (employid, access, callback) {
         employid: employid
     };
     Employ.findOne(query, function (err, doc) {
-        flag = false;
-        for (var i = 0; i < doc.access.length; i++) {
-            if (access == doc.access[i])
-                flag = true;
-        }
-        if (err) {
-            // console.log("Error");
-        } else {
-            if (flag) {
-                // callback('error-grantAccess , not unique');
-            } else {
-                doc.access.push(access);
-                doc.save(callback);
+        if(doc){
+            flag = false;
+            for (var i = 0; i < doc.access.length; i++) {
+                if (access == doc.access[i])
+                    flag = true;
             }
+            if (err) {
+                console.log("Error");
+                callback("Error");
+            } else {
+                if (flag) {
+                    callback('error-grantAccess , not unique');
+                } else {
+                    doc.access.push(access);
+                    doc.save(callback);
+                }
+            }
+        } else {
+            callback("Not valid employ id")
         }
     });
 };
