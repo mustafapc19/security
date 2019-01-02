@@ -23,7 +23,7 @@ global length_menu
 def sw_callback(channel):
     global clickToggle
     global counter
-    if(counter%(length_menu-1)) == 0):
+    if(counter%(length_menu-1) == 0):
         clickToggle = True
 
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
@@ -31,10 +31,13 @@ GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)
 try:
     while True:
         ret,hashval = finger.search()
+        ret = True
+        hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"
         if ret:
-            (flag,res) = getAccessByHash(hashval)
+            (flag,res) = getAccessByHash(hashval,"192.168.1.31","1234")
+            print(res)
             length_menu = len(res["access"])
-            welcome("welcome"+res["username"])
+            welcome("welcome "+res["username"])
             
             menu(0,res["access"])
             while True:

@@ -70,6 +70,7 @@ def search():
 
         ## Wait that finger is read
         while ( f.readImage() == False ):
+            screensaver()
             pass
 
         ## Converts read image to characteristics and stores it in charbuffer 1

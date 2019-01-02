@@ -22,6 +22,7 @@ def invert(draw,x,y,text):
 
 def menu(index,menustr):
     global menuindex
+    menustr = menustr
     font = ImageFont.load_default()
     with canvas(device) as draw:
         draw.rectangle(device.bounding_box, outline="white", fill="black")

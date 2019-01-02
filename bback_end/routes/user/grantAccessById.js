@@ -23,8 +23,6 @@ router.post('/', function (req, res) {
 
         });
     } else {
-        console.log(req.body);
-        
         res.status(500).send("No input given");
 
     }
