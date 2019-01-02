@@ -12,7 +12,7 @@ var Employ = require('../../models/employ');
 */
 
 router.post('/', function (req, res) {
-    if (req.body.employid && req.body.access) {
+    if ((req.body.employid+1) && req.body.access) {
         Employ.grantAccessById(req.body.employid, req.body.access, function (err) {
             if (err) {
                 console.log("accessById", err);
