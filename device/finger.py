@@ -69,8 +69,8 @@ def search():
         #print('Waiting for finger...')
 
         ## Wait that finger is read
-        while ( f.readImage() == False ):
-            pass
+        if ( f.readImage() == False ):
+            return False,False
 
         ## Converts read image to characteristics and stores it in charbuffer 1
         f.convertImage(0x01)

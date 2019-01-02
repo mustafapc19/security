@@ -3,6 +3,7 @@ from rfid import read_rfid
 import finger
 import time
 import RPi.GPIO as GPIO
+from getAccess import getAccessByHash
 
 clk = 11
 dt = 12
@@ -17,11 +18,12 @@ global counter
 counter = 0
 global clickToggle 
 clickToggle = False
+global length_menu
 
 def sw_callback(channel):
     global clickToggle
     global counter
-    if(counter%4 == 0):
+    if(counter%(length_menu-1)) == 0):
         clickToggle = True
 
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
@@ -30,8 +32,11 @@ try:
     while True:
         ret,hashval = finger.search()
         if ret:
-            welcome("welcome akhil")
-            menu(0)
+            (flag,res) = getAccessByHash(hashval)
+            length_menu = len(res["access"])
+            welcome("welcome"+res["username"])
+            
+            menu(0,res["access"])
             while True:
                 if(clickToggle):
                     clickToggle = False
@@ -41,7 +46,7 @@ try:
                     dtState = GPIO.input(dt)
                     if clkState != clkLastState:
                         counter += 1
-                        menu(counter%5)
+                        menu(counter%(length_menu),res["access"])
                     clkLastState = clkState
                     time.sleep(0.1)
         else:

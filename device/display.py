@@ -20,8 +20,7 @@ def invert(draw,x,y,text):
     draw.rectangle((x, y, x+120, y+10), outline=255, fill=255)
     draw.text((x, y), text, font=font, outline=0,fill="black")
 
-def menu(index):
-    menustr=['option1','option2','option3','option4','back']        
+def menu(index,menustr):
     global menuindex
     font = ImageFont.load_default()
     with canvas(device) as draw:
