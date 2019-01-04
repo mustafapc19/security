@@ -20,6 +20,10 @@ global clickToggle
 clickToggle = False
 global length_menu
 
+def init():
+    print "init"
+    return True
+
 def sw_callback(channel):
     global clickToggle
     global counter
@@ -29,30 +33,33 @@ def sw_callback(channel):
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
 
 try:
-    while True:
-        ret,hashval = finger.search()
-        ret = True
-        hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"
-        if ret:
-            (flag,res) = getAccessByHash(hashval,"192.168.1.31","1234")
-            print(res)
-            length_menu = len(res["access"])
-            welcome("welcome "+res["username"])
-            
-            menu(0,res["access"])
-            while True:
-                if(clickToggle):
-                    clickToggle = False
-                    break
-                else:
-                    clkState = GPIO.input(clk)
-                    dtState = GPIO.input(dt)
-                    if clkState != clkLastState:
-                        counter += 1
-                        menu(counter%(length_menu),res["access"])
-                    clkLastState = clkState
-                    time.sleep(0.1)
-        else:
-            welcome("Acess Denied")
+    init_return = init()
+
+    if(init_return):
+        while True:
+            ret,hashval = finger.search()
+            ret = True
+            hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"
+            if ret:
+                (flag,res) = getAccessByHash(hashval,"192.168.1.31","1234")
+                print(res)
+                length_menu = len(res["access"])
+                welcome("welcome "+res["username"])
+                
+                menu(0,res["access"])
+                while True:
+                    if(clickToggle):
+                        clickToggle = False
+                        break
+                    else:
+                        clkState = GPIO.input(clk)
+                        dtState = GPIO.input(dt)
+                        if clkState != clkLastState:
+                            counter += 1
+                            menu(counter%(length_menu),res["access"])
+                        clkLastState = clkState
+                        time.sleep(0.1)
+            else:
+                welcome("Acess Denied")
 finally:
     GPIO.cleanup()
