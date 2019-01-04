@@ -1,4 +1,4 @@
-from display import screensaver,welcome,menu
+from display import screensaver,welcome,menu,init_display,draw_text
 from rfid import read_rfid
 import finger
 import time
@@ -20,8 +20,30 @@ global clickToggle
 clickToggle = False
 global length_menu
 
+def logError(error):
+    #3 yet to complete
+    print error
+
 def init():
-    print "init"
+    ## first component init >> Display
+    display_init_return = init_display()
+
+    if(display_init_return == True):
+        draw_text("Getting Ready")
+        time.sleep(2)
+
+        ## fingerPrint component init
+        finger_init_return = finger.init()
+        if(finger_init_return == True):
+            draw_text("Components Ready")##alignment not correct
+            time.sleep(2)
+        else:
+            logError(finger_init_return)
+            return False
+    else:
+        logError(display_init_return)
+        return False 
+
     return True
 
 def sw_callback(channel):
@@ -37,6 +59,7 @@ try:
 
     if(init_return):
         while True:
+            screensaver()
             ret,hashval = finger.search()
             ret = True
             hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"

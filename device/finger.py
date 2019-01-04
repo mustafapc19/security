@@ -1,18 +1,20 @@
 import time
 from pyfingerprint.pyfingerprint import PyFingerprint
 import hashlib
-from display import screensaver,welcome
+from display import welcome
 
-try:
-    f = PyFingerprint('/dev/ttyS0', 57600, 0xFFFFFFFF, 0x00000000)
+global f
+def init():
+    try:
+        global f
+        f = PyFingerprint('/dev/ttyS0', 57600, 0xFFFFFFFF, 0x00000000)
 
-    if ( f.verifyPassword() == False ):
-        raise ValueError('The given fingerprint sensor password is wrong!')
+        if ( f.verifyPassword() == False ):
+            raise ValueError('The given fingerprint sensor password is wrong!')
 
-except Exception as e:
-    print('The fingerprint sensor could not be initialized!')
-    print('Exception message: ' + str(e))
-    exit(1)
+        return True
+    except Exception as e:
+        return str(e)
 
 def enroll():
     try:
@@ -64,13 +66,11 @@ def enroll():
 
 def search():
     retval=False
-    screensaver()
     try:
         #print('Waiting for finger...')
 
         ## Wait that finger is read
         while ( f.readImage() == False ):
-            screensaver()
             pass
 
         ## Converts read image to characteristics and stores it in charbuffer 1

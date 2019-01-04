@@ -8,9 +8,18 @@ from luma.core.render import canvas
 from luma.core import cmdline, error
 import RPi.GPIO as GPIO
 
-serial = i2c(port=1, address=0x3C)
-device = ssd1306(serial, rotate=0)
+global serial
+global device
 
+def init_display():
+    try:
+        global serial
+        global device   
+        serial = i2c(port=1, address=0x3C)
+        device = ssd1306(serial, rotate=0)
+        return True
+    except Exception as e:
+        return str(e)
 
 global menuindex
 menuindex=0
@@ -71,7 +80,13 @@ def screensaver():
 def welcome(message):
     term = terminal(device)
     term.println(message)
-   
+
+def draw_text(message):
+    with canvas(device) as draw:
+        draw.rectangle(device.bounding_box, outline="white", fill="black")
+        draw.text(((device.width - len(message))/4, device.height/2-2), message, fill="white")
+
+
 # logging
 logging.basicConfig(
     level=logging.DEBUG,
