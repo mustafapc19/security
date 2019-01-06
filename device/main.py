@@ -20,7 +20,7 @@ global clickToggle
 clickToggle = False
 global length_menu
 
-def logError(error):
+def logger(error):
     #3 yet to complete
     print error
 
@@ -29,22 +29,22 @@ def init():
     display_init_return = init_display()
 
     if(display_init_return == True):
-        draw_text("Getting Ready")
+        draw_text("Getting Ready",0,0)## 0 0 are width offset and height offset
         time.sleep(2)
 
         ## fingerPrint component init
         finger_init_return = finger.init()
         if(finger_init_return == True):
-            draw_text("Components Ready")##alignment not correct
+            draw_text("Components Ready",10,0)
             time.sleep(2)
         else:
-            logError(finger_init_return)
-            return False
+            logger(finger_init_return)
+            return False,True
     else:
-        logError(display_init_return)
-        return False 
+        logger(display_init_return)
+        return False,False 
 
-    return True
+    return True,True
 
 def sw_callback(channel):
     global clickToggle
@@ -55,7 +55,7 @@ def sw_callback(channel):
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
 
 try:
-    init_return = init()
+    init_return,display_available = init()
 
     if(init_return):
         while True:
@@ -84,5 +84,8 @@ try:
                         time.sleep(0.1)
             else:
                 welcome("Acess Denied")
+    elif(display_available):
+        draw_text("Error",0,0)## error message if any init failed and display is available
+        time.sleep(10)
 finally:
     GPIO.cleanup()
