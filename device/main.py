@@ -3,7 +3,8 @@ from rfid import read_rfid
 import finger
 import time
 import RPi.GPIO as GPIO
-from getAccess import getAccessByHash
+import subprocess
+from getAccess import getAccessByHash,nodeConnectCheck
 
 clk = 11
 dt = 12
@@ -19,12 +20,48 @@ counter = 0
 global clickToggle 
 clickToggle = False
 global length_menu
+port = '1234'
+ip_address = '127.0.0.1'
 
 def logger(error):
     #3 yet to complete
     print error
 
+def init_server(status):
+    global port
+    global ip_address
+    if(status == True):
+        status = "ready"
+    else:
+        status = "failed"
+
+    ## checking if already the process is running
+    ps = subprocess.Popen("ps -ef | grep node | grep -v grep ", stdout=subprocess.PIPE, stderr=subprocess.PIPE,shell = True)
+    (output,error) = ps.communicate()
+
+    if(output.find('node') == -1):
+        ## starting node process
+        subprocess.Popen('node ../back_end/app.js',shell=True)
+        time.sleep(10)
+    else:
+        print "node process already exists"
+
+    ## checking if the server is responding
+    ret = False
+    loop_val = 5
+    while (loop_val>0):
+        ret = nodeConnectCheck(status,ip_address,port)
+        if(ret == True):
+            break
+        loop_val = loop_val - 1
+        time.sleep(1)
+
+    ## return 
+    return ret
+
 def init():
+    return_val = True 
+    ## Components check
     ## first component init >> Display
     display_init_return = init_display()
 
@@ -36,15 +73,28 @@ def init():
         finger_init_return = finger.init()
         if(finger_init_return == True):
             draw_text("Components Ready",10,0)
-            time.sleep(2)
         else:
             logger(finger_init_return)
-            return False,True
+            draw_text("FingerPrint Failed",12,0)
+            return_val = False
+
     else:
         logger(display_init_return)
-        return False,False 
+        return_val = False
 
-    return True,True
+    ## Server check
+    server_init_return = init_server(return_val)
+
+    if(server_init_return == True):
+        draw_text("Server Ready",12,0)
+        time.sleep(3)
+    else:
+        draw_text("Server Failed",12,0)
+        time.sleep(3)
+        logger("server failed")        
+        return_val = False
+
+    return return_val
 
 def sw_callback(channel):
     global clickToggle
@@ -55,7 +105,7 @@ def sw_callback(channel):
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
 
 try:
-    init_return,display_available = init()
+    init_return = init()
 
     if(init_return):
         while True:
@@ -64,7 +114,7 @@ try:
             ret = True
             hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"
             if ret:
-                (flag,res) = getAccessByHash(hashval,"192.168.1.31","1234")
+                (flag,res) = getAccessByHash(hashval,ip_address,port)
                 print(res)
                 length_menu = len(res["access"])
                 welcome("welcome "+res["username"])
@@ -84,8 +134,6 @@ try:
                         time.sleep(0.1)
             else:
                 welcome("Acess Denied")
-    elif(display_available):
-        draw_text("Error",0,0)## error message if any init failed and display is available
-        time.sleep(10)
+
 finally:
     GPIO.cleanup()

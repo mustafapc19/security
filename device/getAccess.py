@@ -12,3 +12,13 @@ def getAccessByHash(inp,address,port):
     
     r = json.loads(r.text)
     return (flag,r)
+
+def nodeConnectCheck(status,address,port):
+    address = "http://"+address+":"+port+"/device/init"
+    r = requests.post(address,data={"status":status})
+
+    if(r.status_code==200):
+        return True
+    else:
+        return False
+    

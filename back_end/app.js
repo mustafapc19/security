@@ -5,6 +5,7 @@ var bodyParser = require('body-parser');
 var databaseConfig = require('./config/database');
 var Attendance = require('./models/attendance');
 
+var initDevice = require('./routes/device/initDevice');
 var pushAttendance = require('./routes/device/pushAttendance');
 var getAccessByHash = require('./routes/device/getAccessByHash');
 var employAdd = require('./routes/user/employAdd');
@@ -35,7 +36,7 @@ job = new CronJob('00 00 00 * * *', function () {
 console.log('After job instantiation');
 job.start();
 
-
+app.use('/device/init', initDevice);
 app.use('/device/pushAttendance', pushAttendance);
 app.use('/device/getAccessByHash', getAccessByHash);
 app.use('/user/employAdd', employAdd);
