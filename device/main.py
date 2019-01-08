@@ -43,8 +43,6 @@ def init_server(status):
         ## starting node process
         subprocess.Popen('node ../back_end/app.js',shell=True)
         time.sleep(10)
-    else:
-        print "node process already exists"
 
     ## checking if the server is responding
     ret = False
@@ -111,27 +109,28 @@ try:
         while True:
             screensaver()
             ret,hashval = finger.search()
-            ret = True
-            hashval = "4d0418a8b44730763d3dcc08d6020be881634d1f5307efb65e97ae641121a06b"
+            print hashval
             if ret:
                 (flag,res) = getAccessByHash(hashval,ip_address,port)
-                print(res)
-                length_menu = len(res["access"])
-                welcome("welcome "+res["username"])
-                
-                menu(0,res["access"])
-                while True:
-                    if(clickToggle):
-                        clickToggle = False
-                        break
-                    else:
-                        clkState = GPIO.input(clk)
-                        dtState = GPIO.input(dt)
-                        if clkState != clkLastState:
-                            counter += 1
-                            menu(counter%(length_menu),res["access"])
-                        clkLastState = clkState
-                        time.sleep(0.1)
+                if(flag):
+                    length_menu = len(res["access"])
+                    welcome("welcome "+res["username"])
+                    
+                    menu(0,res["access"])
+                    while True:
+                        if(clickToggle):
+                            clickToggle = False
+                            break
+                        else:
+                            clkState = GPIO.input(clk)
+                            dtState = GPIO.input(dt)
+                            if clkState != clkLastState:
+                                counter += 1
+                                menu(counter%(length_menu),res["access"])
+                            clkLastState = clkState
+                            time.sleep(0.1)
+                else:
+                    draw_text("Fingerprint not in database")
             else:
                 welcome("Acess Denied")
 
