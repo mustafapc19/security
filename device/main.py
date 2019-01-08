@@ -4,6 +4,10 @@ import finger
 import time
 import RPi.GPIO as GPIO
 import subprocess
+import sys
+import socket
+import fcntl
+import struct
 from getAccess import getAccessByHash,nodeConnectCheck
 
 clk = 11
@@ -71,9 +75,11 @@ def init():
         finger_init_return = finger.init()
         if(finger_init_return == True):
             draw_text("Components Ready",10,0)
+            time.sleep(2)
         else:
             logger(finger_init_return)
             draw_text("FingerPrint Failed",12,0)
+            time.sleep(2)
             return_val = False
 
     else:
@@ -84,21 +90,34 @@ def init():
     server_init_return = init_server(return_val)
 
     if(server_init_return == True):
-        draw_text("Server Ready",12,0)
-        time.sleep(3)
+        draw_text("Server Ready",0,0)
+        time.sleep(2)
     else:
-        draw_text("Server Failed",12,0)
-        time.sleep(3)
+        draw_text("Server Failed",0,0)
+        time.sleep(2)
         logger("server failed")        
         return_val = False
+
+    ## Connection status
+    ifname = 'wlan0'
+    s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+    ip_device_address = socket.inet_ntoa(fcntl.ioctl(s.fileno(),0x8915,struct.pack('256s', ifname[:15]))[20:24])
+    if(ip_device_address != None):
+        draw_text("Wifi Connected",8,0)
+        time.sleep(2)
+        draw_text("Ip Address",-7,0,True,str(ip_device_address),6,-7)
+        time.sleep(5)
+    else:
+        draw_text("Wifi Not Connected",14,0)
+        time.sleep(2)
+        draw_text("Create hotspot to connect",18,0)
+        time.sleep(5)
 
     return return_val
 
 def sw_callback(channel):
     global clickToggle
-    global counter
-    if(counter%(length_menu-1) == 0):
-        clickToggle = True
+    clickToggle = True
 
 GPIO.add_event_detect(sw, GPIO.FALLING , callback=sw_callback, bouncetime=300)  
 
@@ -109,7 +128,6 @@ try:
         while True:
             screensaver()
             ret,hashval = finger.search()
-            print hashval
             if ret:
                 (flag,res) = getAccessByHash(hashval,ip_address,port)
                 if(flag):
@@ -130,7 +148,8 @@ try:
                             clkLastState = clkState
                             time.sleep(0.1)
                 else:
-                    draw_text("Server Error")
+                    draw_text("Server Error",0,0)
+                    time.sleep(2)
             else:
                 welcome("Acess Denied")
 

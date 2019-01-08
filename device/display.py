@@ -81,10 +81,13 @@ def welcome(message):
     term = terminal(device)
     term.println(message)
 
-def draw_text(message,offwidth,offheight):
+def draw_text(message,offwidth,offheight,second=False,message2="",offwidth2=0,offheight2=0):
     with canvas(device) as draw:
         draw.rectangle(device.bounding_box, outline="white", fill="black")
         draw.text(((device.width - len(message))/4-offwidth, device.height/2-2-offheight), message, fill="white")
+        if(second):
+           draw.text(((device.width - len(message2))/4-offwidth2, device.height/2+2-offheight2), message2, fill="white") 
+
 
 
 # logging

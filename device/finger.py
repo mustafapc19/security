@@ -88,8 +88,8 @@ def search():
             #exit(0)
         else:
             retval=True
-            #print('Found template at position #' + str(positionNumber))
-            #print('The accuracy score is: ' + str(accuracyScore))
+            ##print('Found template at position #' + str(positionNumber))
+            ##print('The accuracy score is: ' + str(accuracyScore))
 
         ## OPTIONAL stuff
         ##
@@ -98,13 +98,14 @@ def search():
         f.loadTemplate(positionNumber, 0x01)
 
         ## Downloads the characteristics of template loaded in charbuffer 1
-        characterics = str(f.downloadCharacteristics(0x01)).encode('utf-8')
+        characterics = str(f.downloadCharacteristics(0x01))
+        ##print characterics
 
         ## Hashes characteristics of template
-        return retval,hashlib.sha256(characterics).hexdigest()
+        return retval,hashlib.sha256(str(positionNumber)).hexdigest()
 
     except Exception as e:
         print('Operation failed!')
-        print('Exception message: ' + str(e))
-        exit(1)
+        print('Exception message: fffff' + str(e))
+        
 
