@@ -130,7 +130,7 @@ try:
                             clkLastState = clkState
                             time.sleep(0.1)
                 else:
-                    draw_text("Fingerprint not in database")
+                    draw_text("Server Error")
             else:
                 welcome("Acess Denied")
 
